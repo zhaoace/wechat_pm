@@ -4,6 +4,7 @@ import sha
 import xmltodict
 import json
 import pymongo
+import urllib
 import urllib2
 import yaml
 import random
@@ -34,6 +35,7 @@ def verify(user_data, token):
         return False
 
 
+
 def xml_string_to_json(xml_str):
     dic_xml = xmltodict.parse(xml_str)
     json_res = json.dumps(dic_xml)
@@ -59,9 +61,11 @@ def lucky_draw():
 
 
 def verify_votes(vote_type, candidate):
-    if vote_type not in range(1, 3):
+    if not vote_type.isdigit() or not candidate.isdigit():
         return False
-    elif candidate not in range(1, 4):
+    elif int(vote_type) not in range(1, 3):
+        return False
+    elif int(candidate) not in range(1, 10):
         return False
     else:
         return True
@@ -74,6 +78,9 @@ def voting(vote_type, candidate, voter):
         # 选票 vote
     """
     if verify_votes(vote_type, candidate):
+        vote_type = int(vote_type)
+        candidate = int(candidate)
+        print u"处理投票"
         collection = VOTE_TYPES[vote_type]
         vote_pool = pymongo.MongoClient().test1[collection]
         if vote_pool.find({"voter": voter}).count() == 0:
@@ -88,9 +95,27 @@ def voting(vote_type, candidate, voter):
             print "Thank you , the candidate {0} have {1} votes now.".format(candidate, vote_count)
             return "Thank you , the candidate {0} have {1} votes now.".format(candidate, vote_count)
     else:
-        print "别闹了，好好投票。。。"
-        return "别闹了，好好投票。。。"
+        # return u"别闹了，好好投票。。。"
+        return "Wrong vote format, please check and retry"
 
+
+def reply_msg_to_wx_user(user, message):
+    access_token = get_client_credential()
+    url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="+access_token
+    print "reply_msg_to_wx_user message:"+message
+    values = {
+        "touser": user,
+        "msgtype": "text",
+        "text": {
+                "content": message
+            }
+        }
+    json_values = json.dumps(values)
+    print json_values
+    req = urllib2.Request(url, json_values)
+    response = urllib2.urlopen(req)
+    the_page = response.read()
+    print the_page
 
 def add_splunker(splunk_id, name="None"):
     current = pymongo.MongoClient().splunkers.current
@@ -109,28 +134,8 @@ def get_client_credential():
 
 
 if __name__ == "__main__":
-    # print get_client_credential()
-    # print lucky_draw()
-    voting(1, 2, 3)
-    voting(1, 2, 3)
-    voting(1, 2, 3)
-    voting(1, 2, 3)
-    voting(1, 3, 3)
-    voting(1, 3, 3)
-    voting(1, 3, 3)
-    voting(1, 3, 3)
-    voting(2, 3, 3)
-    voting(2, 5, 3)
-    voting(2, "你说啥", 3)
-    voting(2, 3, 3)
-    voting(2, 3, 3)
-    voting(2, 3, 3)
-    voting(3, 3, 3)
-    voting(3, 3, 3)
-    voting(3, 3, 3)
-    voting(5, 3, 3)
-    voting(3, 3, 3)
-    voting(3, 3, 3)
-    voting(3, 3, 3)
-
-    pass
+    print verify_votes(u"1",2)
+    print verify_votes(1,3)
+    print verify_votes(1,4)
+    print verify_votes(5,5)
+    print verify_votes(1,10)
