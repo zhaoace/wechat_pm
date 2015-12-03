@@ -21,14 +21,12 @@ class index:
         print "---- POST start ---"
         user_data = web.data()
         wx_content = wechat.read_post_content(user_data)
-        if "splunkers" == wx_content:
-            print "注册注册注册"
-        elif "lucky_draw" == wx_content:
-            print "大抽奖"
+        if "投票" == wx_content[0] or "vote" = wx_content[0].lower():
+            wechat.voting(wx_content.)
+            print wx_content
         else:
-            print "啥操作？" + wx_content
+            print "无效操作" + wx_content[0]
 
-        # json_res = wechat.xml_string_to_json(user_data)
         print "---- POST end ---"
         return "success"
 
