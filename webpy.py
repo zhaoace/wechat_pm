@@ -21,8 +21,9 @@ class index:
         print "---- POST start ---"
         user_data = web.data()
         wx_content = wechat.read_post_content(user_data)
-        if "投票" == wx_content[0] or "vote" = wx_content[0].lower():
-            wechat.voting(wx_content.)
+        wx_poster =  wechat.get_poster(user_data)
+        if "投票" == wx_content[0] or "vote" == wx_content[0].lower():
+            wechat.voting(wx_content[0],wx_content[1],wx_poster)
             print wx_content
         else:
             print "无效操作" + wx_content[0]

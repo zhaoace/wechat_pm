@@ -46,20 +46,25 @@ def read_post_content(user_data):
     content = root.find("Content").text.strip().split()
     return content
 
+def get_poster(user_data):
+    root = ET.fromstring(user_data)
+    poster = root.find("FromUserName").text.strip()
+    return poster
+
 
 def lucky_draw():
     current = pymongo.MongoClient().splunkers.current
     lucky_one = current.find()
     return lucky_one
 
+
 def verify_votes(vote_type, candidate):
-    if vote_type not in range(1,3):
+    if vote_type not in range(1, 3):
         return False
-    elif candidate not in range(1,4):
+    elif candidate not in range(1, 4):
         return False
     else:
         return True
-
 
 
 def voting(vote_type, candidate, voter):
@@ -77,14 +82,14 @@ def voting(vote_type, candidate, voter):
             print "Thank you , the candidate {0} have {1} votes now.".format(candidate, vote_count)
             return "Thank you , the candidate {0} have {1} votes now.".format(candidate, vote_count)
         else:
-            vote_pool.find_one_and_update({"voter": voter},  {'$set': {"candidate": candidate}})
+            vote_pool.find_one_and_update(
+                {"voter": voter},  {'$set': {"candidate": candidate}})
             vote_count = vote_pool.find({"candidate": candidate}).count()
             print "Thank you , the candidate {0} have {1} votes now.".format(candidate, vote_count)
             return "Thank you , the candidate {0} have {1} votes now.".format(candidate, vote_count)
     else:
         print "别闹了，好好投票。。。"
         return "别闹了，好好投票。。。"
-
 
 
 def add_splunker(splunk_id, name="None"):
